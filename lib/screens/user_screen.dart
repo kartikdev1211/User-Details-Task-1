@@ -56,8 +56,8 @@ class _UserScreenState extends State<UserScreen> {
 
   Widget _buildList(List<User> user, BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final horizontalPadding = screenWidth * 0.03; // 3% of screen width
-    final verticalPadding = screenWidth * 0.015; // 1.5% of screen width
+    final horizontalPadding = screenWidth * 0.03;
+    final verticalPadding = screenWidth * 0.015;
 
     if (user.isEmpty) {
       return const Center(
