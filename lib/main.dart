@@ -5,9 +5,9 @@ import 'package:user_details/bloc/user_event.dart';
 import 'package:user_details/repo/user_repo.dart';
 import 'package:user_details/screens/user_screen.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp( MyApp(repository: UserRepo(),));
+  runApp(MyApp(repository: UserRepo()));
 }
 
 class MyApp extends StatelessWidget {
@@ -22,7 +22,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: RepositoryProvider.value(value: repository,child: BlocProvider(create: (_)=>UserBloc(repository)..add( LoadUser()),child: UserScreen(),),),
+      home: RepositoryProvider.value(
+        value: repository,
+        child: BlocProvider(
+          create: (_) => UserBloc(repository)..add(LoadUser()),
+          child: UserScreen(),
+        ),
+      ),
     );
   }
 }

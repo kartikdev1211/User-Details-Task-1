@@ -1,47 +1,57 @@
-import 'package:sqflite/sqflite.dart';
-import 'package:user_details/models/user_model.dart';
 import 'package:path/path.dart';
-class DBProvider{
-  static Database? db;
-  static const table="users";
-  Future<Database> get database async{
-    db??=await _init();
-    return db!;
+import 'package:sqflite/sqflite.dart';
+import '../models/user_model.dart';
+
+class DBHelper {
+  static Database? _db;
+
+  Future<Database> get database async {
+    return _db ??= await initDb();
   }
-  Future<Database> _init() async {
-    final path = join(await getDatabasesPath(), 'users.db');
-    return openDatabase(
+
+  Future<Database> initDb() async {
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, 'user.db');
+
+    return await openDatabase(
       path,
       version: 1,
-      onCreate: (db, _) async {
-        await db.execute('''
-          CREATE TABLE $table (
-            id INTEGER PRIMARY KEY,
-            name TEXT,
-            username TEXT,
-            email TEXT,
-            phone TEXT,
-            website TEXT,
-            address TEXT,   -- JSON string
-            company TEXT    -- JSON string
-          )
-        ''');
+      onCreate: (db, version) {
+        return db.execute('''
+      CREATE TABLE users (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        username TEXT,
+        email TEXT,
+        phone TEXT,
+        website TEXT,
+        address TEXT,
+        company TEXT
+      )
+    ''');
       },
     );
   }
-  Future<void> insertUsers(List<User> users)async{
-    final db=await database;
-    final batch=db.batch();
-    for(var u in users){
-      batch.insert(table, u.toMap(),conflictAlgorithm: ConflictAlgorithm.replace);
 
+  Future<void> insertUsers(List<User> users) async {
+    final db = await database;
+    for (var user in users) {
+      await db.insert(
+        'users',
+        user.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
-    await batch.commit(noResult: true);
   }
-  Future<List<User>> getUser()async{
-    final db=await database;
-    final row=await db.query(table,orderBy: 'name ASC');
-    return row.map(User.fromMap).toList();
+
+  Future<List<User>> getUsers() async {
+    final db = await database;
+    final result = await db.query('users', orderBy: 'name ASC');
+    return result.map((e) => User.fromMap(e)).toList();
   }
-  Future<bool> isEmpty()async=>(await (await database).query(table,limit: 1)).isEmpty;
+
+  Future<void> clearUsers() async {
+    final db = await database;
+    await db.delete('users');
+  }
 }
